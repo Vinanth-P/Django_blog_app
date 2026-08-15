@@ -126,3 +126,9 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'blog' / 'static',
 ]
+
+MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = '/media/'
+
+LOGIN_REDIRECT_URL = 'blog-home'
+LOGIN_URL = 'login'
