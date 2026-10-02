@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Django Blog — Brag</title>
+  <!-- GSAP core -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #000;
+      color: #333;
+    }
+
+    .scene {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+    }
+
+    /* ── REUSABLE WEBSITE UI COMPONENTS ── */
+    .website-wrapper {
+      width: 1920px;
+      height: 1080px;
+      background: #fafafa;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation Bar (.bg-steel) */
+    .site-header {
+      width: 100%;
+      height: 72px;
+      background-color: #5f788a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+      flex-shrink: 0;
+      z-index: 50;
+    }
+
+    .header-container {
+      width: 1440px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .navbar-brand {
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffffff;
+      text-decoration: none;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-badge {
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(255,255,255,0.2);
+      color: #ffffff;
+      padding: 3px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-item {
+      font-size: 16px;
+      font-weight: 500;
+      color: #cbd5db;
+      text-decoration: none;
+      transition: color 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      color: #ffffff;
+    }
+
+    .nav-item.active {
+      font-weight: 600;
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0,0,0,0.15);
+      padding: 5px 14px 5px 6px;
+      border-radius: 20px;
+    }
+
+    .nav-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #428bca;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Main Page Content (2 Columns: col-md-8 and col-md-4) */
+    .main-container {
+      width: 1440px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      display: grid;
+      grid-template-columns: 940px 420px;
+      gap: 40px;
+      flex: 1;
+    }
+
+    /* Content Cards */
+    .content-section {
+      background: #ffffff;
+      border: 1px solid #dddddd;
+      border-radius: 4px;
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+
+    /* Alerts */
+    .alert {
+      padding: 14px 20px;
+      border-radius: 4px;
+      font-size: 15px;
+      font-weight: 500;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .alert-success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    /* Article / Post Styling */
+    .article-container {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+    }
+
+    .article-img {
+      width: 65px;
+      height: 65px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #5f788a 0%, #3a4d59 100%);
+      color: #ffffff;
+      font-size: 26px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .article-body {
+      flex: 1;
+    }
+
+    .article-metadata {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #e3e3e3;
+    }
+
+    .article-author {
+      font-size: 15px;
+      font-weight: 600;
+      color: #5f788a;
+      text-decoration: none;
+    }
+
+    .article-date {
+      font-size: 13px;
+      color: #777777;
+    }
+
+    .article-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #444444;
+      line-height: 1.3;
+      margin-bottom: 12px;
+      text-decoration: none;
+      display: block;
+    }
+
+    .article-content {
+      font-size: 15px;
+      color: #555555;
+      line-height: 1.7;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-block;
+      font-weight: 500;
+      text-align: center;
+      padding: 7px 16px;
+      font-size: 14px;
+      border-radius: 4px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .btn-update {
+      background-color: #6c757d;
+      color: #ffffff;
+    }
+
+    .btn-delete {
+      background-color: #dc3545;
+      color: #ffffff;
+    }
+
+    .btn-info {
+      background-color: #17a2b8;
+      color: #ffffff;
+      border-color: #17a2b8;
+    }
+
+    .btn-outline-info {
+      color: #17a2b8;
+      background-color: transparent;
+      border-color: #17a2b8;
+    }
+
+    .pagination-wrap {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    /* Sidebar Styling */
+    .sidebar-card h3 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #444444;
+      margin-bottom: 12px;
+    }
+
+    .sidebar-desc {
+      font-size: 14px;
+      color: #6c757d;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .list-group {
+      list-style: none;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid #e9ecef;
+    }
+
+    .list-group-item {
+      padding: 12px 18px;
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #e9ecef;
+      font-size: 14px;
+      color: #495057;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .list-group-item:last-child {
+      border-bottom: none;
+    }
+
+    .list-group-item.active-item {
+      background-color: #e9ecef;
+      font-weight: 600;
+      color: #5f788a;
+    }
+
+    /* Form Styles */
+    .form-heading {
+      font-size: 24px;
+      font-weight: 700;
+      color: #444;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 15px;
+      font-family: inherit;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      color: #333;
+      background: #fff;
+    }
+
+    .form-control-textarea {
+      height: 140px;
+      resize: none;
+      line-height: 1.6;
+    }
+
+    .btn-submit {
+      padding: 10px 28px;
+      background: #428bca;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      border-radius: 4px;
+    }
+
+    /* ── SCENE SPECIFICS ── */
+
+    /* SCENE 1: HOOK */
+    #scene-hook {
+      background: #5f788a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #hook-title {
+      font-size: 104px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -2px;
+    }
+
+    #hook-sub {
+      font-size: 36px;
+      font-weight: 300;
+      color: rgba(255,255,255,0.85);
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      margin-top: 24px;
+    }
+
+    .tech-stack-badges {
+      display: flex;
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .tech-badge {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+
+    /* SCENE 3: CURSOR */
+    #cursor {
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23333' stroke='%23fff' stroke-width='1.5' d='M4 0l16 12-7 2-4 8z'/%3E%3C/svg%3E") no-repeat center/contain;
+      pointer-events: none;
+      z-index: 200;
+      left: 710px;
+      top: 185px;
+    }
+
+    /* SCENE 5: OUTRO */
+    #scene-outro {
+      background: #5f788a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #outro-title {
+      font-size: 68px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -1px;
+      text-align: center;
+    }
+
+    #outro-sub {
+      font-size: 24px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.85);
+      margin-top: 20px;
+      letter-spacing: 2px;
+    }
+
+    #black-overlay {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── COMPOSITION ROOT ── -->
+  <div id="composition-root"
+       data-composition-id="django-blog-brag"
+       data-width="1920"
+       data-height="1080"
+       data-duration="20">
+
+    <!-- SCENE 1: HOOK (0 – 3.2s) -->
+    <div class="scene clip" id="scene-hook" data-start="0" data-duration="3.2">
+      <div id="hook-inner" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;">
+        <h1 id="hook-title">Django Blog</h1>
+        <p  id="hook-sub">Write.&nbsp;&nbsp;Publish.&nbsp;&nbsp;Read.</p>
+        <div class="tech-stack-badges" id="hook-badges">
+          <span class="tech-badge">🐍 Python 3.12</span>
+          <span class="tech-badge">🎯 Django 5.0</span>
+          <span class="tech-badge">⚡ Full Authentication & Pagination</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 2: FULL BLOG FEED WITH SIDEBAR (3.0 – 8.2s) -->
+    <div class="scene clip" id="scene-feed" data-start="3.0" data-duration="5.2">
+      <div id="feed-inner" class="website-wrapper">
+        <header class="site-header">
+          <div class="header-container">
+            <div class="brand-group">
+              <a class="navbar-brand" href="#">Django Blog</a>
+              <span class="brand-badge">App</span>
+            </div>
+            <div class="nav-links">
+              <a class="nav-item active" href="#">Home</a>
+              <a class="nav-item" href="#">About</a>
+              <a class="nav-item" href="#">New Post</a>
+              <div class="user-pill">
+                <div class="nav-avatar">V</div>
+                <a class="nav-item active" href="#">Profile</a>
+              </div>
+              <a class="nav-item" href="#">Logout</a>
+            </div>
+          </div>
+        </header>
+
+        <main class="main-container">
+          <!-- Left Column (col-md-8) -->
+          <div class="main-column">
+            <div class="alert alert-success" id="feed-alert">
+              <span>✓ Welcome back, <strong>vinanth</strong>! You are logged in.</span>
+            </div>
+
+            <!-- Post Card 1 -->
+            <article class="content-section article-card" id="post-1">
+              <div class="article-container">
+                <div class="article-img">V</div>
+                <div class="article-body">
+                  <div class="article-metadata">
+                    <a class="article-author" href="#">vinanth</a>
+                    <span class="article-date">October 02, 2026</span>
+                  </div>
+                  <h2><a class="article-title" href="#">Getting Started with Django Framework</a></h2>
+                  <p class="article-content">
+                    Django is a high-level Python web framework that encourages rapid development and clean, pragmatic design. Built by experienced developers, it takes care of much of the hassle of web development...
+                  </p>
+                </div>
+              </div>
+            </article>
+
+            <!-- Post Card 2 -->
+            <article class="content-section article-card" id="post-2">
+              <div class="article-container">
+                <div class="article-img" style="background: linear-gradient(135deg, #17a2b8, #117a8b);">C</div>
+                <div class="article-body">
+                  <div class="article-metadata">
+                    <a class="article-author" href="#">corey_ms</a>
+                    <span class="article-date">October 01, 2026</span>
+                  </div>
+                  <h2><a class="article-title" href="#">Flask vs Django - Which Is Better?</a></h2>
+                  <p class="article-content">
+                    When starting a Python web project, one of the first decisions you need to make is choosing between Flask and Django. Both frameworks have huge communities and distinct philosophies...
+                  </p>
+                </div>
+              </div>
+            </article>
+
+            <!-- Pagination -->
+            <div class="pagination-wrap" id="feed-pagination">
+              <button class="btn btn-outline-info">First</button>
+              <button class="btn btn-outline-info">Previous</button>
+              <button class="btn btn-info">1</button>
+              <button class="btn btn-outline-info">2</button>
+              <button class="btn btn-outline-info">3</button>
+              <button class="btn btn-outline-info">Next</button>
+              <button class="btn btn-outline-info">Last</button>
+            </div>
+          </div>
+
+          <!-- Right Sidebar Column (col-md-4) -->
+          <div class="sidebar-column" id="feed-sidebar">
+            <div class="content-section sidebar-card">
+              <h3>Our Sidebar</h3>
+              <p class="sidebar-desc">Explore categories, updates and blog statistics.</p>
+              <ul class="list-group">
+                <li class="list-group-item active-item">📌 Latest Posts</li>
+                <li class="list-group-item">📢 Announcements</li>
+                <li class="list-group-item">📅 Calendars</li>
+                <li class="list-group-item">📁 Categories</li>
+              </ul>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- SCENE 3: POST DETAIL & CLICK ACTION (8.1 – 13.2s) -->
+    <div class="scene clip" id="scene-detail" data-start="8.1" data-duration="5.1">
+      <div id="detail-inner" class="website-wrapper" style="position:relative;">
+        <div id="cursor"></div>
+
+        <header class="site-header">
+          <div class="header-container">
+            <div class="brand-group">
+              <a class="navbar-brand" href="#">Django Blog</a>
+              <span class="brand-badge">Post Detail</span>
+            </div>
+            <div class="nav-links">
+              <a class="nav-item" href="#">Home</a>
+              <a class="nav-item" href="#">About</a>
+              <a class="nav-item" href="#">New Post</a>
+              <div class="user-pill">
+                <div class="nav-avatar">V</div>
+                <a class="nav-item active" href="#">Profile</a>
+              </div>
+              <a class="nav-item" href="#">Logout</a>
+            </div>
+          </div>
+        </header>
+
+        <main class="main-container">
+          <div class="main-column">
+            <article class="content-section" id="detail-card">
+              <div class="article-container">
+                <div class="article-img">V</div>
+                <div class="article-body">
+                  <div class="article-metadata" style="justify-content: space-between;">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                      <a class="article-author" href="#">vinanth</a>
+                      <span class="article-date">October 02, 2026</span>
+                    </div>
+                    <!-- Author Action Buttons -->
+                    <div class="action-buttons">
+                      <button class="btn btn-update" id="btn-update-target">Update</button>
+                      <button class="btn btn-delete">Delete</button>
+                    </div>
+                  </div>
+                  <h1 class="article-title" style="font-size:32px;margin-top:8px;">Getting Started with Django Framework</h1>
+                  <p class="article-content" style="font-size:16px;line-height:1.8;margin-top:16px;">
+                    Django is a high-level Python web framework that encourages rapid development and clean, pragmatic design. Built by experienced developers, it takes care of much of the hassle of web development, so you can focus on writing your app without reinventing the wheel.
+                    <br><br>
+                    It includes a full object-relational mapper (ORM), user authentication, admin panel, dynamic templating, form validation, and URL routing out of the box.
+                  </p>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div class="sidebar-column">
+            <div class="content-section sidebar-card">
+              <h3>Our Sidebar</h3>
+              <p class="sidebar-desc">Explore categories, updates and blog statistics.</p>
+              <ul class="list-group">
+                <li class="list-group-item active-item">📌 Latest Posts</li>
+                <li class="list-group-item">📢 Announcements</li>
+                <li class="list-group-item">📅 Calendars</li>
+                <li class="list-group-item">📁 Categories</li>
+              </ul>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- SCENE 4: NEW POST FORM & LIVE TYPING (13.1 – 17.2s) -->
+    <div class="scene clip" id="scene-form" data-start="13.1" data-duration="4.1">
+      <div id="form-inner" class="website-wrapper">
+        <header class="site-header">
+          <div class="header-container">
+            <div class="brand-group">
+              <a class="navbar-brand" href="#">Django Blog</a>
+              <span class="brand-badge">Create</span>
+            </div>
+            <div class="nav-links">
+              <a class="nav-item" href="#">Home</a>
+              <a class="nav-item" href="#">About</a>
+              <a class="nav-item active" href="#" style="color:#fff;">New Post</a>
+              <div class="user-pill">
+                <div class="nav-avatar">V</div>
+                <a class="nav-item" href="#">Profile</a>
+              </div>
+              <a class="nav-item" href="#">Logout</a>
+            </div>
+          </div>
+        </header>
+
+        <main class="main-container">
+          <div class="main-column">
+            <div class="alert alert-success" id="form-success-toast" style="opacity:0;display:none;">
+              <span>✓ Your post has been published successfully!</span>
+            </div>
+
+            <div class="content-section" id="form-card">
+              <h2 class="form-heading">Create New Blog Post</h2>
+              <div class="form-group">
+                <label class="form-label">Title</label>
+                <input class="form-control" id="form-title-input" type="text" value="" placeholder="Enter post title..." readonly>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Content</label>
+                <textarea class="form-control form-control-textarea" readonly>This blog application features custom user profiles, pagination, authentication, password reset, and full CRUD operations built entirely with Django and Python.</textarea>
+              </div>
+              <button class="btn btn-submit" id="btn-post-submit">Publish Post</button>
+            </div>
+          </div>
+
+          <div class="sidebar-column">
+            <div class="content-section sidebar-card">
+              <h3>Our Sidebar</h3>
+              <p class="sidebar-desc">Explore categories, updates and blog statistics.</p>
+              <ul class="list-group">
+                <li class="list-group-item">📌 Latest Posts</li>
+                <li class="list-group-item active-item">📢 Announcements</li>
+                <li class="list-group-item">📅 Calendars</li>
+                <li class="list-group-item">📁 Categories</li>
+              </ul>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- SCENE 5: OUTRO (17.1 – 20.0s) -->
+    <div class="scene clip" id="scene-outro" data-start="17.1" data-duration="2.9">
+      <div id="outro-inner" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;">
+        <h1 id="outro-title">Paginated.&nbsp;Authenticated.&nbsp;Deployed.</h1>
+        <p  id="outro-sub">Django Blog App — Built with Python & Django</p>
+      </div>
+    </div>
+
+  </div><!-- /composition-root -->
+
+  <div id="black-overlay"></div>
+
+  <!-- ── AUDIO TRACKS ── -->
+  <audio id="bg-music"
+         data-start="0" data-duration="20"
+         data-track-index="10" data-volume="0.30"
+         src="assets/music/happy-beats-business-moves-vol-9-by-ende-dot-app.mp3">
+  </audio>
+  <audio id="sfx-drop"
+         data-start="4.18" data-duration="0.11"
+         data-track-index="11" data-volume="0.70"
+         src="assets/sfx/interface/drop_001.ogg">
+  </audio>
+  <audio id="sfx-click"
+         data-start="9.20" data-duration="0.10"
+         data-track-index="12" data-volume="0.65"
+         src="assets/sfx/interface/click_001.ogg">
+  </audio>
+  <audio id="sfx-key1" data-start="13.55" data-duration="0.3" data-track-index="13" data-volume="0.55" src="assets/sfx/keyboard/keypress-001.wav"></audio>
+  <audio id="sfx-key2" data-start="13.70" data-duration="0.3" data-track-index="14" data-volume="0.55" src="assets/sfx/keyboard/keypress-007.wav"></audio>
+  <audio id="sfx-key3" data-start="13.82" data-duration="0.3" data-track-index="15" data-volume="0.55" src="assets/sfx/keyboard/keypress-013.wav"></audio>
+  <audio id="sfx-key4" data-start="13.95" data-duration="0.3" data-track-index="16" data-volume="0.55" src="assets/sfx/keyboard/keypress-019.wav"></audio>
+  <audio id="sfx-bell"
+         data-start="17.38" data-duration="1.48"
+         data-track-index="17" data-volume="0.55"
+         src="assets/sfx/impact/impactBell_heavy_000.ogg">
+  </audio>
+
+  <script>
+    // ── GSAP Timeline Setup ──
+    (function buildTimeline() {
+      gsap.defaults({ overwrite: 'auto' });
+      const tl = gsap.timeline();
+
+      // ── SCENE 1: HOOK (0 – 3.2s) ──
+      tl.fromTo('#hook-inner', { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0)
+        .fromTo('#hook-title',
+          { opacity: 0, y: 24, scale: 0.96 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: 'power2.out' },
+          0.3)
+        .fromTo('#hook-sub',
+          { opacity: 0, y: 12 },
+          { opacity: 1, y: 0, duration: 0.4 },
+          1.2)
+        .fromTo('#hook-badges > span',
+          { opacity: 0, y: 15 },
+          { opacity: 1, y: 0, duration: 0.4, stagger: 0.12, ease: 'power2.out' },
+          1.6)
+        .to('#hook-inner', { opacity: 0, duration: 0.35 }, 2.85);
+
+      // ── SCENE 2: FEED (3.0 – 8.2s) ──
+      tl.fromTo('#feed-inner', { opacity: 0 }, { opacity: 1, duration: 0.3 }, 3.0)
+        .fromTo('#feed-alert',
+          { opacity: 0, y: -10 },
+          { opacity: 1, y: 0, duration: 0.35 },
+          3.3)
+        .fromTo('#post-1',
+          { opacity: 0, y: 24 },
+          { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' },
+          4.23)
+        .fromTo('#post-2',
+          { opacity: 0, y: 24 },
+          { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' },
+          4.65)
+        .fromTo('#feed-sidebar',
+          { opacity: 0, x: 20 },
+          { opacity: 1, x: 0, duration: 0.45, ease: 'power2.out' },
+          4.8)
+        .fromTo('#feed-pagination',
+          { opacity: 0 },
+          { opacity: 1, duration: 0.35 },
+          5.4)
+        .to('#feed-inner', { opacity: 0, duration: 0.35 }, 7.75);
+
+      // ── SCENE 3: DETAIL & CURSOR CLICK (8.1 – 13.2s) ──
+      tl.fromTo('#detail-inner', { opacity: 0 }, { opacity: 1, duration: 0.3 }, 8.1)
+        .fromTo('#detail-card',
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' },
+          8.3)
+        .fromTo('#cursor',
+          { opacity: 0, x: 390, y: 315 },
+          { opacity: 1, x: 0, y: 0, duration: 0.8, ease: 'power2.inOut' },
+          8.4)
+        // Click effect on Update button
+        .to('#btn-update-target', { scale: 0.92, duration: 0.1, yoyo: true, repeat: 1 }, 9.2)
+        .to('#cursor', { opacity: 0, duration: 0.2 }, 9.6)
+        .to('#detail-inner', { opacity: 0, duration: 0.35 }, 12.75);
+
+      // ── SCENE 4: FORM & TYPING (13.1 – 17.2s) ──
+      tl.fromTo('#form-inner', { opacity: 0 }, { opacity: 1, duration: 0.3 }, 13.1)
+        .fromTo('#form-card',
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' },
+          13.3)
+        // Submit button click
+        .to('#btn-post-submit', { scale: 0.95, duration: 0.1, yoyo: true, repeat: 1 }, 15.6)
+        // Show success alert toast
+        .set('#form-success-toast', { display: 'flex' }, 15.7)
+        .to('#form-success-toast', { opacity: 1, y: 0, duration: 0.3 }, 15.7)
+        .to('#form-inner', { opacity: 0, duration: 0.35 }, 16.85);
+
+      // ── SCENE 5: OUTRO (17.1 – 20.0s) ──
+      tl.fromTo('#outro-inner', { opacity: 0 }, { opacity: 1, duration: 0.3 }, 17.1)
+        .fromTo('#outro-title',
+          { opacity: 0, y: 16 },
+          { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' },
+          17.4)
+        .fromTo('#outro-sub',
+          { opacity: 0 },
+          { opacity: 1, duration: 0.4 },
+          18.0)
+        .fromTo('#black-overlay',
+          { opacity: 0 },
+          { opacity: 1, duration: 0.6 },
+          19.4);
+
+      // Register timeline
+      window.__timelines = window.__timelines || {};
+      window.__timelines['django-blog-brag'] = tl;
+    }());
+
+    // Typing simulation for Scene 4 Title Input
+    function startTyping() {
+      const input = document.getElementById('form-title-input');
+      const text  = 'Building Modern Web Apps with Django 5';
+      let i = 0;
+      const tick = () => {
+        if (i <= text.length) {
+          input.value = text.slice(0, i++);
+          setTimeout(tick, 60);
+        }
+      };
+      tick();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      gsap.delayedCall(13.6, startTyping);
+    });
+  </script>
+</body>
+</html>

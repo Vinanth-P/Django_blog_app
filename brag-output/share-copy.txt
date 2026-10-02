@@ -1,0 +1,1 @@
+Built a full blog platform with Django. Login, write, publish, paginate. Zero JS frameworks. Just Django doing its thing.
